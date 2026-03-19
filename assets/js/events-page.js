@@ -75,7 +75,7 @@ function renderUpcoming(list) {
     article.innerHTML =
       '<img src="' +
       escapeHtml(item.poster || item.image || "assets/images/tact-logo.jpg") +
-      '" alt="' +
+      '" onerror="this.onerror=null;this.src=\'assets/images/tact-logo.jpg\';" alt="' +
       escapeHtml(item.title || "Event image") +
       '" loading="lazy">' +
       '<div class="event-body">' +

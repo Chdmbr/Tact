@@ -161,7 +161,7 @@ function buildCard(item, isPast) {
   card.innerHTML =
     '<img src="' +
     escapeHtml(item.poster || "assets/images/tact-logo.jpg") +
-    '" alt="' +
+    '" onerror="this.onerror=null;this.src=\'assets/images/tact-logo.jpg\';" alt="' +
     escapeHtml((item.title || "Event") + " poster") +
     '" loading="lazy">' +
     "<div>" +
@@ -188,7 +188,7 @@ function buildUpcomingCard(item) {
   card.innerHTML =
     '<img src="' +
     escapeHtml(item.poster || "assets/images/tact-logo.jpg") +
-    '" alt="' +
+    '" onerror="this.onerror=null;this.src=\'assets/images/tact-logo.jpg\';" alt="' +
     escapeHtml((item.title || "Event") + " poster") +
     '" loading="lazy">' +
     '<div class="home-upcoming-copy">' +
