@@ -202,6 +202,44 @@ function readEvents() {
   return out;
 }
 
+function repairPosterPermissions() {
+  var props = PropertiesService.getScriptProperties();
+  var sheetId = props.getProperty("SHEET_ID");
+  var sheetName = props.getProperty("SHEET_NAME") || "events";
+  if (!sheetId) return { ok: false, error: "Missing SHEET_ID" };
+
+  var ss = SpreadsheetApp.openById(sheetId);
+  var sh = ss.getSheetByName(sheetName);
+  if (!sh || sh.getLastRow() < 2) return { ok: true, updated: 0, scanned: 0 };
+
+  var range = sh.getDataRange();
+  var values = range.getValues();
+  var headers = values[0];
+  var posterIndex = headers.indexOf("posterUrl");
+  if (posterIndex < 0) return { ok: false, error: "posterUrl column not found" };
+
+  var updated = 0;
+  var scanned = 0;
+  for (var r = 1; r < values.length; r++) {
+    var current = String(values[r][posterIndex] || "");
+    var fileId = extractDriveFileId(current);
+    scanned++;
+    if (!fileId) continue;
+
+    try {
+      var file = DriveApp.getFileById(fileId);
+      file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+      values[r][posterIndex] = buildPublicImageUrl(file);
+      updated++;
+    } catch (_err) {
+      // Ignore per-row errors and continue.
+    }
+  }
+
+  range.setValues(values);
+  return { ok: true, updated: updated, scanned: scanned };
+}
+
 function getOrCreateChild(parentFolder, childName) {
   var it = parentFolder.getFoldersByName(childName);
   return it.hasNext() ? it.next() : parentFolder.createFolder(childName);
@@ -222,4 +260,15 @@ function isValidPin(value) {
 
 function buildPublicImageUrl(file) {
   return "https://drive.google.com/uc?export=view&id=" + file.getId();
+}
+
+function extractDriveFileId(url) {
+  var raw = String(url || "");
+  var queryMatch = raw.match(/[?&]id=([^&]+)/i);
+  if (queryMatch && queryMatch[1]) return queryMatch[1];
+
+  var pathMatch = raw.match(/\/d\/([^/]+)/i);
+  if (pathMatch && pathMatch[1]) return pathMatch[1];
+
+  return "";
 }

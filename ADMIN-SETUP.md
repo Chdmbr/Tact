@@ -69,3 +69,4 @@ The backend auto-creates columns if empty:
 - Google Drive is used automatically through the Google account that owns the Apps Script deployment.
 - You only need to set `DRIVE_ROOT_FOLDER_ID` once; posters are stored inside that Drive folder.
 - After updating `Code.gs`, redeploy Web App so image links are published in web-friendly format.
+- For old events whose posters were uploaded before this fix, run `repairPosterPermissions()` once in Apps Script editor.
