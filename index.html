@@ -882,10 +882,19 @@
 
       /* CTAs */
       .ctas {
-        display: flex;
-        flex-wrap: wrap;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 10px;
         margin-top: 16px;
+      }
+
+      .ctas .btn {
+        width: 100%;
+        min-height: 46px;
+      }
+
+      .ctas .btn:hover {
+        transform: none;
       }
 
       .btn {
@@ -936,13 +945,13 @@
         outline-offset: 3px;
       }
 
-      /* Gentle colour oscillation for the two secondary CTAs in the closing row */
+      /* Keep the closing CTA row visually stable */
       .ctas .btn-secondary {
-        animation: cta-oscillate 7s ease-in-out infinite alternate;
+        animation: none;
       }
 
       .ctas .btn-secondary:hover {
-        animation-play-state: paused;
+        animation: none;
       }
 
       @keyframes cta-oscillate {
@@ -1138,6 +1147,10 @@
         .photo-grid {
           grid-template-columns: repeat(2, minmax(0, 1fr));
         }
+
+        .ctas {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
       }
 
       @media (max-width: 600px) {
@@ -1154,6 +1167,10 @@
         }
 
         .photo-grid {
+          grid-template-columns: minmax(0, 1fr);
+        }
+
+        .ctas {
           grid-template-columns: minmax(0, 1fr);
         }
       }
