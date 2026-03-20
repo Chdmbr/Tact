@@ -172,6 +172,9 @@
       font-size: 16px;
       color: #173125;
     }
+    .event-copy {
+      min-width: 0;
+    }
     .event-meta {
       margin: 0 0 4px;
       font-size: 12px;
@@ -181,10 +184,16 @@
       margin: 0;
       font-size: 12px;
       color: #738278;
+      word-break: break-word;
     }
     .danger {
       background: linear-gradient(180deg, #bb3c2d, #9a2f22);
       color: #fff;
+    }
+    .event-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
     }
     .accent {
       background: linear-gradient(180deg, #1e5aa8, #184886);
@@ -195,7 +204,22 @@
     }
     @media (max-width: 680px) {
       .row-2, .btn-row { grid-template-columns: 1fr; }
-      .manager-toolbar, .event-item { grid-template-columns: 1fr; }
+      .manager-toolbar { grid-template-columns: 1fr; }
+      .event-item {
+        grid-template-columns: 64px 1fr;
+        align-items: start;
+      }
+      .event-item img {
+        width: 64px;
+        height: 64px;
+      }
+      .event-actions {
+        grid-column: 1 / -1;
+        justify-content: stretch;
+      }
+      .event-actions button {
+        width: 100%;
+      }
     }
   </style>
 </head>
@@ -730,6 +754,7 @@
         };
 
         const details = document.createElement("div");
+        details.className = "event-copy";
         details.innerHTML =
           "<h3>" + escapeHtml(item.title || "Untitled Event") + "</h3>" +
           '<p class="event-meta">' +
@@ -747,9 +772,13 @@
           handleDeleteEvent(item, removeBtn);
         });
 
+        const actions = document.createElement("div");
+        actions.className = "event-actions";
+        actions.appendChild(removeBtn);
+
         article.appendChild(poster);
         article.appendChild(details);
-        article.appendChild(removeBtn);
+        article.appendChild(actions);
         eventList.appendChild(article);
       });
     }
