@@ -238,7 +238,9 @@ function getFile(repo, path) {
 function parseJsonFile(repo, path) {
   var file = getFile(repo, path);
   if (!file.exists) return null;
-  return JSON.parse(file.content || "{}");
+  // Some repo JSON files were saved with a UTF-8 BOM; strip it before parsing.
+  var text = String(file.content || "").replace(/^\uFEFF/, "");
+  return JSON.parse(text || "{}");
 }
 
 function putIfMissing(repo, path, text, message) {
@@ -402,4 +404,9 @@ function isValidPin(value) {
 function jsonOut(obj, statusCode) {
   obj.statusCode = statusCode;
   return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
+}
+
+
+function authorizeUrlFetch() {
+    UrlFetchApp.fetch("https://api.github.com", { muteHttpExceptions: true });
 }
