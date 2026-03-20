@@ -86,14 +86,23 @@ Submitting the admin form writes directly to:
 
 The website reads from repo content, so new events appear after the repo updates are published.
 
-## 6) PIN behavior
+## 6) Current admin UX
+
+- Unlock with the admin PIN first
+- Pressing `Enter` in the PIN field works the same as clicking `Unlock Form`
+- Event time is entered with separate `From Time` and `To Time` fields
+- After a successful submit, `admin.html` refreshes so the form is cleared
+- `Manage Existing Events` loads the current event list from GitHub with poster preview, title, date, and delete controls
+- Deleting an event removes the full `content/events/<slug>/` folder and rebuilds `content/events/events-feed.js`
+
+## 7) PIN behavior
 
 - Use `admin.html` to verify the PIN before unlocking the form
 - If no PIN exists yet, you can set the first PIN from the admin page
 - If a PIN already exists, the old PIN is required to change it
 - PIN must be at least 4 digits
 
-## 7) Local testing
+## 8) Local testing
 
 You can test the static site locally from the repo root:
 

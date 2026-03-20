@@ -378,13 +378,18 @@
       togglePinToolsBtn.textContent = willShow ? "Hide PIN Settings" : "Set / Change PIN";
     });
 
+    pinInput.addEventListener("keydown", function (event) {
+      if (event.key !== "Enter") return;
+      event.preventDefault();
+      unlockBtn.click();
+    });
+
     toggleManageBtn.addEventListener("click", function () {
       const willShow = manageCard.classList.contains("hidden");
       manageCard.classList.toggle("hidden", !willShow);
       toggleManageBtn.textContent = willShow ? "Hide Existing Events" : "Manage Existing Events";
       if (willShow) {
         loadExistingEvents(false);
-        window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
       }
     });
 
@@ -413,7 +418,6 @@
         pinHint.classList.remove("hidden");
         pinCard.classList.add("hidden");
         formCard.classList.remove("hidden");
-        window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
       } catch (_err) {
         alert("Could not verify PIN. Please try again.");
       } finally {
@@ -759,13 +763,6 @@
         return;
       }
 
-      const deletePin = window.prompt("Enter admin PIN to delete this event:");
-      if (deletePin === null) return;
-      if (!String(deletePin).trim()) {
-        alert("PIN is required to delete.");
-        return;
-      }
-
       button.disabled = true;
       showManageStatus('Deleting "' + title + '" from GitHub...', false);
 
@@ -773,15 +770,13 @@
         const response = await fetch(ADMIN_CONFIG.endpoint, {
           method: "POST",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({ action: "deleteEvent", pin: String(deletePin).trim(), slug: slug })
+          body: JSON.stringify({ action: "deleteEvent", pin: unlockedPin, slug: slug })
         });
         const body = await response.json();
         if (!response.ok || !body || body.ok === false) {
           throw new Error(body && body.error ? body.error : "Delete failed.");
         }
 
-        unlockedPin = String(deletePin).trim();
-        pinInput.value = unlockedPin;
         showManageStatus('Deleted "' + title + '". Refreshing list...', false);
         await loadExistingEvents(false);
       } catch (err) {
