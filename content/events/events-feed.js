@@ -50,6 +50,18 @@ window.TACT_EVENT_FEED = [
     "homepageMatter": "hihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihi"
   },
   {
+    "slug": "2026-03-28-hi-nitish",
+    "title": "hi nitish",
+    "date": "2026-03-28",
+    "time": "10:00 AM - 1:00 PM",
+    "location": "bandar",
+    "status": "scheduled",
+    "folder": "content/events/2026-03-28-hi-nitish",
+    "poster": "content/events/2026-03-28-hi-nitish/poster.jpg",
+    "teaser": "nithish",
+    "homepageMatter": "nithish"
+  },
+  {
     "slug": "2026-yuvati-mentorship-day",
     "title": "Vijnana Yuvati Mentorship Day",
     "date": "2026-04-10",
