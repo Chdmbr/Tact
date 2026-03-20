@@ -49,7 +49,9 @@ if (document.getElementById("upcoming-list") && document.getElementById("archive
 function renderEventSections(events) {
   var buckets = splitEvents(events);
   renderUpcoming(buckets.upcoming);
-  renderArchive(buckets.archive);
+  scheduleAsync(function () {
+    renderArchive(buckets.archive);
+  });
 }
 
 function splitEvents(events) {
@@ -112,32 +114,15 @@ function renderUpcoming(list) {
     return;
   }
 
-  list.forEach(function (item) {
-    var article = document.createElement("article");
-    article.className = "event-card";
-    article.innerHTML =
-      '<img src="' +
-      escapeHtml(item.poster || item.image || "assets/images/tact-logo.jpg") +
-      '" onerror="this.onerror=null;this.src=\'assets/images/tact-logo.jpg\';" alt="' +
-      escapeHtml(item.title || "Event image") +
-      '" loading="eager" fetchpriority="high" decoding="async">' +
-      '<div class="event-body">' +
-      '<span class="meta">' +
-      escapeHtml(formatDate(item.date)) +
-      " | " +
-      escapeHtml(item.time || "Time TBA") +
-      " | " +
-      escapeHtml(item.location || "TBA") +
-      "</span>" +
-      "<h3>" +
-      escapeHtml(item.title || "Untitled event") +
-      "</h3>" +
-      "<p>" +
-      escapeHtml(item.teaser || item.homepageMatter || "") +
-      "</p>" +
-      "</div>";
-    root.appendChild(article);
-  });
+  root.appendChild(buildUpcomingCard(list[0], true));
+
+  if (list.length > 1) {
+    scheduleAsync(function () {
+      list.slice(1).forEach(function (item) {
+        root.appendChild(buildUpcomingCard(item, false));
+      });
+    });
+  }
 }
 
 function renderArchive(list) {
@@ -176,6 +161,37 @@ function renderArchive(list) {
       "</div>";
     root.appendChild(article);
   });
+}
+
+function buildUpcomingCard(item, isPriority) {
+  var article = document.createElement("article");
+  article.className = "event-card" + (isPriority ? " event-card--priority" : "");
+  article.innerHTML =
+    '<img src="' +
+    escapeHtml(item.poster || item.image || "assets/images/tact-logo.jpg") +
+    '" onerror="this.onerror=null;this.src=\'assets/images/tact-logo.jpg\';" alt="' +
+    escapeHtml(item.title || "Event image") +
+    '" loading="' +
+    (isPriority ? "eager" : "lazy") +
+    '" fetchpriority="' +
+    (isPriority ? "high" : "auto") +
+    '" decoding="async">' +
+    '<div class="event-body">' +
+    '<span class="meta">' +
+    escapeHtml(formatDate(item.date)) +
+    " | " +
+    escapeHtml(item.time || "Time TBA") +
+    " | " +
+    escapeHtml(item.location || "TBA") +
+    "</span>" +
+    "<h3>" +
+    escapeHtml(item.title || "Untitled event") +
+    "</h3>" +
+    "<p>" +
+    escapeHtml(item.teaser || item.homepageMatter || "") +
+    "</p>" +
+    "</div>";
+  return article;
 }
 
 function escapeHtml(value) {
