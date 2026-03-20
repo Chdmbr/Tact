@@ -1,9 +1,4 @@
-document.addEventListener("DOMContentLoaded", function () {
-  if (window.TACT_CHROME) {
-    window.TACT_CHROME.renderHeader();
-    window.TACT_CHROME.initDropdowns();
-  }
-
+function initEventsPage() {
   var initialEvents = [];
   if (typeof window.getTactEventFeedSnapshot === "function") {
     initialEvents = window.getTactEventFeedSnapshot();
@@ -14,16 +9,42 @@ document.addEventListener("DOMContentLoaded", function () {
   renderEventSections(initialEvents);
 
   if (typeof window.loadTactEventFeed === "function") {
-    window.loadTactEventFeed({ forceRefresh: true }).then(function (freshEvents) {
-      if (!sameEventList(initialEvents, freshEvents)) {
-        renderEventSections(freshEvents);
-      }
+    scheduleAsync(function () {
+      window.loadTactEventFeed({ forceRefresh: true }).then(function (freshEvents) {
+        if (!sameEventList(initialEvents, freshEvents)) {
+          renderEventSections(freshEvents);
+        }
+      });
     });
   }
 
-  var year = document.getElementById("year");
-  if (year) year.textContent = String(new Date().getFullYear());
-});
+  scheduleAsync(function () {
+    if (window.TACT_CHROME) {
+      window.TACT_CHROME.renderHeader();
+      window.TACT_CHROME.initDropdowns();
+    }
+
+    var year = document.getElementById("year");
+    if (year) year.textContent = String(new Date().getFullYear());
+  });
+}
+
+function scheduleAsync(callback) {
+  if (typeof window.requestAnimationFrame === "function") {
+    window.requestAnimationFrame(function () {
+      window.setTimeout(callback, 0);
+    });
+    return;
+  }
+
+  window.setTimeout(callback, 0);
+}
+
+if (document.getElementById("upcoming-list") && document.getElementById("archive-list")) {
+  initEventsPage();
+} else {
+  document.addEventListener("DOMContentLoaded", initEventsPage, { once: true });
+}
 
 function renderEventSections(events) {
   var buckets = splitEvents(events);
