@@ -1,4 +1,6 @@
-function initEventsPage() {
+async function initEventsPage() {
+  setEventsPageLoading(true);
+
   var initialEvents = [];
   if (typeof window.getTactEventFeedSnapshot === "function") {
     initialEvents = window.getTactEventFeedSnapshot();
@@ -6,18 +8,22 @@ function initEventsPage() {
     initialEvents = Array.isArray(window.TACT_EVENT_FEED) ? window.TACT_EVENT_FEED.slice() : [];
   }
 
-  preloadPriorityPoster(initialEvents);
-  renderEventSections(initialEvents);
+  var eventsToRender = initialEvents;
 
   if (typeof window.loadTactEventFeed === "function") {
-    scheduleAsync(function () {
-      window.loadTactEventFeed({ forceRefresh: true }).then(function (freshEvents) {
-        if (!sameEventList(initialEvents, freshEvents)) {
-          renderEventSections(freshEvents);
-        }
-      });
-    });
+    try {
+      var freshEvents = await window.loadTactEventFeed({ forceRefresh: true });
+      if (Array.isArray(freshEvents) && freshEvents.length) {
+        eventsToRender = freshEvents;
+      }
+    } catch (_error) {
+      eventsToRender = initialEvents;
+    }
   }
+
+  preloadPriorityPoster(eventsToRender);
+  renderEventSections(eventsToRender);
+  setEventsPageLoading(false);
 
   scheduleAsync(function () {
     if (window.TACT_CHROME) {
@@ -51,15 +57,15 @@ function scheduleAsync(callback) {
 if (document.getElementById("upcoming-list") && document.getElementById("archive-list")) {
   initEventsPage();
 } else {
-  document.addEventListener("DOMContentLoaded", initEventsPage, { once: true });
+  document.addEventListener("DOMContentLoaded", function () {
+    initEventsPage();
+  }, { once: true });
 }
 
 function renderEventSections(events) {
   var buckets = splitEvents(events);
   renderUpcoming(buckets.upcoming);
-  scheduleAsync(function () {
-    renderArchive(buckets.archive);
-  });
+  renderArchive(buckets.archive);
 }
 
 function splitEvents(events) {
@@ -185,7 +191,7 @@ function renderArchive(list) {
       escapeHtml(item.poster || item.image || "assets/images/tact-logo.jpg") +
       '" onerror="this.onerror=null;this.src=\'assets/images/tact-logo.jpg\';" alt="' +
       escapeHtml(item.title || "Event image") +
-      '" loading="lazy" decoding="async" style="object-fit:fill;">' +
+      '" width="132" height="164" loading="lazy" decoding="async" style="object-fit:fill;">' +
       '<div class="archive-body">' +
       '<span class="meta">' +
       escapeHtml(formatDate(item.date)) +
@@ -213,7 +219,7 @@ function buildUpcomingCard(item, isPriority) {
     escapeHtml(item.poster || item.image || "assets/images/tact-logo.jpg") +
     '" onerror="this.onerror=null;this.src=\'assets/images/tact-logo.jpg\';" alt="' +
     escapeHtml(item.title || "Event image") +
-    '" loading="' +
+    '" width="132" height="164" loading="' +
     (isPriority ? "eager" : "lazy") +
     '" fetchpriority="' +
     (isPriority ? "high" : "auto") +
@@ -245,4 +251,9 @@ function escapeHtml(value) {
     .replace(/>/g, "&gt;")
     .replace(/\"/g, "&quot;")
     .replace(/'/g, "&#39;");
+}
+
+function setEventsPageLoading(isLoading) {
+  if (!document.body) return;
+  document.body.classList.toggle("events-page--loading", isLoading);
 }
