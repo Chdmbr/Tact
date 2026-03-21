@@ -1,6 +1,10 @@
-document.addEventListener("DOMContentLoaded", function () {
+function initProgramPage() {
   if (window.TACT_CHROME) {
-    window.TACT_CHROME.renderHeader();
+    if (typeof window.TACT_CHROME.ensureHeader === "function") {
+      window.TACT_CHROME.ensureHeader();
+    } else {
+      window.TACT_CHROME.renderHeader();
+    }
     window.TACT_CHROME.initDropdowns();
   }
 
@@ -78,7 +82,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
   var year = document.getElementById("year");
   if (year) year.textContent = String(new Date().getFullYear());
-});
+}
+
+window.TACT_PAGE_RUNTIME = window.TACT_PAGE_RUNTIME || {};
+window.TACT_PAGE_RUNTIME.initProgramPage = initProgramPage;
+
+if (document.getElementById("program-title")) {
+  initProgramPage();
+} else {
+  document.addEventListener("DOMContentLoaded", function () {
+    if (document.getElementById("program-title")) {
+      initProgramPage();
+    }
+  }, { once: true });
+}
 
 function setText(id, value) {
   var el = document.getElementById(id);

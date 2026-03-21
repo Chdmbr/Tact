@@ -64,9 +64,21 @@
       "  </div>",
       "</header>"
     ].join("");
+    delete root.dataset.dropdownInit;
+  }
+
+  function ensureHeader() {
+    var root = document.getElementById("site-header-root");
+    if (!root) return;
+    if (root.querySelector(".site-header")) return;
+    renderSiteHeader();
   }
 
   function initDropdowns() {
+    var root = document.getElementById("site-header-root");
+    if (!root || root.dataset.dropdownInit === "true") return;
+    root.dataset.dropdownInit = "true";
+
     var navItems = document.querySelectorAll(".nav-item--has-menu");
     var openItem = null;
 
@@ -108,6 +120,7 @@
   }
 
   window.TACT_CHROME = {
+    ensureHeader: ensureHeader,
     renderHeader: renderSiteHeader,
     initDropdowns: initDropdowns
   };

@@ -1,11 +1,27 @@
-document.addEventListener("DOMContentLoaded", async function () {
+var homeEventsBoardState = {
+  timer: null
+};
+
+async function initHomeEventsBoard() {
+  teardownHomeEventsBoard();
+  clearHomeEventsBoard();
+
   var feed = [];
   if (typeof window.loadTactEventFeed === "function") {
     feed = await window.loadTactEventFeed();
   } else {
     feed = Array.isArray(window.TACT_EVENT_FEED) ? window.TACT_EVENT_FEED.slice() : [];
   }
-  if (!feed.length) return;
+  if (!feed.length) {
+    renderUpcomingCarousel(
+      "home-upcoming-track",
+      "home-upcoming-dots",
+      [],
+      "No upcoming events right now."
+    );
+    renderTrack("home-previous-track", [], "No past events available yet.", true);
+    return;
+  }
 
   var today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -42,8 +58,21 @@ document.addEventListener("DOMContentLoaded", async function () {
   if (upcomingState && upcomingState.count > 1) {
     autoScrollUpcoming(upcomingState);
   }
+}
 
-});
+window.TACT_PAGE_RUNTIME = window.TACT_PAGE_RUNTIME || {};
+window.TACT_PAGE_RUNTIME.initHomeEventsBoard = initHomeEventsBoard;
+window.TACT_PAGE_RUNTIME.teardownHomeEventsBoard = teardownHomeEventsBoard;
+
+if (document.getElementById("home-upcoming-track") && document.getElementById("home-previous-track")) {
+  initHomeEventsBoard();
+} else {
+  document.addEventListener("DOMContentLoaded", function () {
+    if (document.getElementById("home-upcoming-track") && document.getElementById("home-previous-track")) {
+      initHomeEventsBoard();
+    }
+  }, { once: true });
+}
 
 function parseDate(value) {
   var date = new Date((value || "") + "T00:00:00");
@@ -210,22 +239,50 @@ function buildUpcomingCard(item) {
 }
 
 function autoScrollUpcoming(state) {
-  var timer = window.setInterval(state.advance, 4300);
+  homeEventsBoardState.timer = window.setInterval(state.advance, 4300);
   state.track.addEventListener("mouseenter", function () {
-    window.clearInterval(timer);
+    window.clearInterval(homeEventsBoardState.timer);
   });
   state.track.addEventListener("mouseleave", function () {
-    window.clearInterval(timer);
-    timer = window.setInterval(state.advance, 4300);
+    window.clearInterval(homeEventsBoardState.timer);
+    homeEventsBoardState.timer = window.setInterval(state.advance, 4300);
   });
 
   state.dots.addEventListener("mouseenter", function () {
-    window.clearInterval(timer);
+    window.clearInterval(homeEventsBoardState.timer);
   });
   state.dots.addEventListener("mouseleave", function () {
-    window.clearInterval(timer);
-    timer = window.setInterval(state.advance, 4300);
+    window.clearInterval(homeEventsBoardState.timer);
+    homeEventsBoardState.timer = window.setInterval(state.advance, 4300);
   });
+}
+
+function teardownHomeEventsBoard() {
+  if (homeEventsBoardState.timer) {
+    window.clearInterval(homeEventsBoardState.timer);
+    homeEventsBoardState.timer = null;
+  }
+}
+
+function clearHomeEventsBoard() {
+  var upcomingTrack = document.getElementById("home-upcoming-track");
+  var upcomingDots = document.getElementById("home-upcoming-dots");
+  var previousTrack = document.getElementById("home-previous-track");
+
+  if (upcomingTrack) {
+    upcomingTrack.innerHTML = "";
+    upcomingTrack.style.transition = "none";
+    upcomingTrack.style.transform = "translateY(0)";
+  }
+
+  if (upcomingDots) {
+    upcomingDots.innerHTML = "";
+    upcomingDots.style.display = "none";
+  }
+
+  if (previousTrack) {
+    previousTrack.innerHTML = "";
+  }
 }
 
 function escapeHtml(value) {

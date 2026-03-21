@@ -21,7 +21,11 @@ function initEventsPage() {
 
   scheduleAsync(function () {
     if (window.TACT_CHROME) {
-      window.TACT_CHROME.renderHeader();
+      if (typeof window.TACT_CHROME.ensureHeader === "function") {
+        window.TACT_CHROME.ensureHeader();
+      } else {
+        window.TACT_CHROME.renderHeader();
+      }
       window.TACT_CHROME.initDropdowns();
     }
 
@@ -29,6 +33,9 @@ function initEventsPage() {
     if (year) year.textContent = String(new Date().getFullYear());
   });
 }
+
+window.TACT_PAGE_RUNTIME = window.TACT_PAGE_RUNTIME || {};
+window.TACT_PAGE_RUNTIME.initEventsPage = initEventsPage;
 
 function scheduleAsync(callback) {
   if (typeof window.requestAnimationFrame === "function") {
