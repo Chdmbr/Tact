@@ -39,7 +39,7 @@
       '            <button class="nav-trigger" type="button" aria-haspopup="true" aria-expanded="false">Events & Media</button>',
       '            <ul class="nav-menu" role="menu">',
       '              <li><a href="events.html#upcoming" role="menuitem">Upcoming Events</a></li>',
-      '              <li><a href="events.html#archive" role="menuitem">Past Events</a></li>',
+      '              <li><a href="events.html#past" role="menuitem">Past Events</a></li>',
       '              <li><a href="events.html" role="menuitem">News & Updates</a></li>',
       '              <li><a href="events.html" role="menuitem">Calendar</a></li>',
       "            </ul>",

@@ -178,7 +178,7 @@ function renderArchive(list) {
       escapeHtml(item.poster || item.image || "assets/images/tact-logo.jpg") +
       '" onerror="this.onerror=null;this.src=\'assets/images/tact-logo.jpg\';" alt="' +
       escapeHtml(item.title || "Event image") +
-      '" loading="lazy" decoding="async">' +
+      '" loading="lazy" decoding="async" style="object-fit:fill;">' +
       '<div class="archive-body">' +
       '<span class="meta">' +
       escapeHtml(formatDate(item.date)) +
@@ -212,7 +212,7 @@ function buildUpcomingCard(item, isPriority) {
     (isPriority ? "high" : "auto") +
     '" decoding="' +
     (isPriority ? "sync" : "async") +
-    '">' +
+    '" style="object-fit:fill;">' +
     '<div class="event-body">' +
     '<span class="meta">' +
     escapeHtml(formatDate(item.date)) +

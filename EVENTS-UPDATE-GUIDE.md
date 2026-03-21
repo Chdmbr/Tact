@@ -24,7 +24,7 @@ powershell -ExecutionPolicy Bypass -File tools/event-system.ps1 -Action build-fe
 ## Archive behavior
 
 - If event date is today or future: it appears in **Upcoming Events**.
-- If event date is in the past: it appears in **Archived Events** automatically.
+- If event date is in the past: it appears in **Past Events** automatically.
 
 No manual archive step is needed.
 
@@ -42,6 +42,7 @@ For each event, keep one folder in `content/events/`:
 
 - Open `events.html`
 - Events page: `events.html`
+- Direct link to past events section: `events.html#past`
 
 ## Homepage behavior
 
